@@ -13,14 +13,6 @@ app.use(cors({
     credentials: true
 }));
 
-app.post('/register', (req, res) => {
-    const username = req.body.username
-    const password = req.body.password
-    const email = req.body.email
-    console.log(username + password + email)
-    res.json({ com: 'passed' })
-})
-
 client.connect(function (err) {
     if (err) {
         return console.error('could not connect to postgres', err);
@@ -32,6 +24,15 @@ client.connect(function (err) {
         console.log("connected");
     });
 });
+
+app.post('/register', (req, res) => {
+    const username = req.body.username
+    const password = req.body.password
+    const email = req.body.email
+    console.log(username + password + email)
+    res.json({ com: 'passed' })
+
+})
 
 app.listen(3002, function () {
     console.log("started 3002")
