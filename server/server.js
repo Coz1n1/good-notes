@@ -50,7 +50,16 @@ app.post('/register', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
+    const username = req.body.username
+    const password = req.body.password
 
+    client.query('SELECT name FROM users WHERE name = $1', [username], (err, result) => {
+        if (result.rows[0]) {
+            res.json({ back: 'exists' })
+        } else {
+            res.json({ back: "Check combination and try again" })
+        }
+    })
 })
 
 app.listen(3002, function () {
