@@ -3,6 +3,7 @@ const cors = require('cors')
 const app = express()
 const http = require('http')
 const bcrypt = require('bcrypt')
+const { sign } = require('jsonwebtoken')
 var pg = require('pg');
 var conString = "postgres://vpqoiofu:6xwCEq9MDTttZgbiRANukvE-UM9_s9dk@rogue.db.elephantsql.com/vpqoiofu";
 var client = new pg.Client(conString);
@@ -53,11 +54,18 @@ app.post('/login', (req, res) => {
     const username = req.body.username
     const password = req.body.password
 
-    client.query('SELECT name FROM users WHERE name = $1', [username], (err, result) => {
+    client.query('SELECT * FROM users WHERE name = $1', [username], (err, result) => {
         if (result.rows[0]) {
-            res.json({ back: 'exists' })
+            bcrypt.compare(password, result.rows[0].password, (err, response) => {
+                if (!response) {
+                    res.json({ err: "Check your combination and try again" })
+                } else {
+                    const accessToken = sign({ username: username, id: result.rows[0].id }, 'secretToLogin')
+                    res.json(accessToken)
+                }
+            })
         } else {
-            res.json({ back: "Check combination and try again" })
+            res.json({ err: "User doesn't exists" })
         }
     })
 })
