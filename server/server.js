@@ -53,7 +53,8 @@ app.post('/register', (req, res) => {
 app.post('/login', (req, res) => {
     const username = req.body.username
     const password = req.body.password
-
+    const bool = req.body.info
+    console.log(bool)
     client.query('SELECT * FROM users WHERE name = $1', [username], (err, result) => {
         if (result.rows[0]) {
             bcrypt.compare(password, result.rows[0].password, (err, response) => {
@@ -61,7 +62,7 @@ app.post('/login', (req, res) => {
                     res.json({ err: "Check your combination and try again" })
                 } else {
                     const accessToken = sign({ username: username, id: result.rows[0].id }, 'secretToLogin')
-                    res.json(accessToken)
+                    res.json({ accessToken: accessToken, username: username })
                 }
             })
         } else {
