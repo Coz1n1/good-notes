@@ -53,8 +53,6 @@ app.post('/register', (req, res) => {
 app.post('/login', (req, res) => {
     const username = req.body.username
     const password = req.body.password
-    const bool = req.body.info
-    console.log(bool)
     client.query('SELECT * FROM users WHERE name = $1', [username], (err, result) => {
         if (result.rows[0]) {
             bcrypt.compare(password, result.rows[0].password, (err, response) => {
@@ -67,6 +65,32 @@ app.post('/login', (req, res) => {
             })
         } else {
             res.json({ err: "User doesn't exists" })
+        }
+    })
+})
+
+app.post('/addnote', (req, res) => {
+    const username = req.body.username
+    const title = req.body.title
+    const content = req.body.content
+    const date = req.body.date
+
+    client.query('INSERT INTO notes (name,title,text,date) VALUES ($1,$2,$3,$4)', [username, title, content, date], (err, result) => {
+        if (err) {
+            console.log(err)
+        } else {
+            res.json({ com: 'added' })
+        }
+    })
+})
+
+app.post('/getAll', (req, res) => {
+    const username = req.body.username
+    client.query('SELECT notes.id,title,text,date FROM users,notes WHERE users.name=$1 AND notes.name=$1', [username], (err, result) => {
+        if (err) {
+            console.log(err)
+        } else {
+            res.json(result)
         }
     })
 })
